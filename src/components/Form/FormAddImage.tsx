@@ -49,7 +49,7 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
     description: {
       required: 'Descrição obrigatória',
       maxLength: {
-        value: 20,
+        value: 65,
         message: 'Máximo de 65 caracteres',
       },
     },
@@ -58,12 +58,10 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
   const queryClient = useQueryClient();
   const mutation = useMutation(
     async (image: AddNewImageFormData) => {
-      const response = await api.post('api/images', {
+      await api.post('api/images', {
         ...image,
         url: imageUrl,
       });
-
-      return response.data.image;
     },
     {
       onSuccess: () => {
@@ -76,11 +74,8 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
     useForm();
   const { errors } = formState;
 
-  const onSubmit = async (
-    data: AddNewImageFormData
-  ): Promise<AddNewImageFormData> => {
+  const onSubmit = async (data: AddNewImageFormData): Promise<void> => {
     try {
-      // TODO SHOW ERROR TOAST IF IMAGE URL DOES NOT EXISTS
       if (!imageUrl) {
         toast({
           status: 'error',
@@ -88,7 +83,6 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
           description:
             'É preciso adicionar e aguardar o upload de uma imagem antes de realizar o cadastro.',
         });
-        // eslint-disable-next-line no-useless-return
         return;
       }
       await mutation.mutateAsync(data);
@@ -97,21 +91,17 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
         title: 'Imagem cadastrada',
         description: 'Sua imagem foi cadastrada com sucesso.',
       });
-      // TODO EXECUTE ASYNC MUTATION
-      // TODO SHOW SUCCESS TOAST
     } catch {
       toast({
         status: 'error',
         title: 'Falha no cadastro',
         description: 'Ocorreu um erro ao tentar cadastrar a sua imagem.',
       });
-      // TODO SHOW ERROR TOAST IF SUBMIT FAILED
     } finally {
       reset();
       closeModal();
       setImageUrl('');
       setLocalImageUrl('');
-      // TODO CLEAN FORM, STATES AND CLOSE MODAL
     }
   };
 
